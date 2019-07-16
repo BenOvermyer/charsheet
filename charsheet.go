@@ -1,30 +1,36 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
-	"ioutil"
-	"json"
 	"html/template"
+	"io/ioutil"
 	"os"
 )
 
 // CharSheet is a character sheet
 type CharSheet struct {
+	Name    string  `json:"name"`
+	Classes []Class `json:"classes"`
+	Skills  []Skill `json:"skills"`
+}
+
+// Class is a character class
+type Class struct {
+	Name  string `json:"name"`
+	Level int    `json:"level"`
+}
+
+// Skill is a character skill
+type Skill struct {
 	Name string `json:"name"`
-	Classes struct  {
-		Name string `json:"name"`
-		Level int `json:"level"`
-	} `json:"classes"`
-	Skills struct {
-		Name string `json:"name"`
-		Rank int `json:"rank"`
-	} `json:"skills"`
+	Rank int    `json:"rank"`
 }
 
 func getSheetTemplate() string {
 	return `<!DOCTYPE html>
-	<html>
+<html>
 	<head>
 	  <title>Character Sheet</title>
 	</head>
@@ -47,7 +53,7 @@ func getSheetTemplate() string {
 			</tbody>
 		</table>
 	</body>
-	</html>`
+</html>`
 }
 
 func main() {
@@ -57,11 +63,18 @@ func main() {
 	outputFile := flag.String("o", "sheet.html", "Output file to create")
 	flag.Parse()
 
-	byteValue, _ := ioutil.ReadAll(*filePath)
+	// Open our jsonFile
+	jsonFile, err := os.Open(*filePath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer jsonFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
 
 	json.Unmarshal(byteValue, &charSheetData)
 
-	htmlIndexTemplate := getSheetTemplate()
+	htmlTemplate := getSheetTemplate()
 
 	writer, err := os.Create("./" + *outputFile)
 	if err != nil {
@@ -69,7 +82,9 @@ func main() {
 		return
 	}
 
-	t, err := template.New("htmlIndex").Parse(htmlIndexTemplate)
+	fmt.Println(charSheetData)
+
+	t, err := template.New("sheet").Parse(htmlTemplate)
 	if err != nil {
 		fmt.Println(err)
 		return

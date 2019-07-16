@@ -1,0 +1,28 @@
+{
+  "name": "John Doe",
+  "classes": [
+    {
+      "name": "Technical Writer",
+      "level": 3
+    },
+    {
+      "name": "Developer",
+      "level": 5
+    },
+    {
+      "name": "Manager",
+      "level": 1
+    }
+  ],
+  "skills": [
+    {
+      "name": "Go",
+      "rank": 3
+    },
+    {
+      "name": "PHP",
+      "rank": 5
+    }
+  ]
+}
+
